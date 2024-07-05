@@ -1,0 +1,13 @@
+torch
+torchvision
+torchaudio
+torchtext
+matplotlib
+tensorboard
+jiwer==2.4.0
+numpy
+tqdm
+sentencepiece
+scikit-image
+gdown
+av
