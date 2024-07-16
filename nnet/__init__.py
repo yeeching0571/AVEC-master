@@ -46,4 +46,8 @@ from .model import Model
 from .module import Module
 
 # Branches
-from . import datasets
+# from . import datasets
+# 延迟导入 datasets 模块
+def get_datasets():
+    from . import datasets
+    return datasets
