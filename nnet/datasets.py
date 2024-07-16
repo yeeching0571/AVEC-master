@@ -419,69 +419,69 @@ class LRS(Dataset):
             to_path=os.path.join(self.root, "LRS2")
         )   
 
-    def download_lrs3(self):
+    # def download_lrs3(self):
 
-        # Download Pretrain
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partaa",
-            path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partaa")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partab",
-            path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partab")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partac",
-            path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partac")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partad",
-            path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partad")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partae",
-            path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partae")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partaf",
-            path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partaf")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partag",
-            path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partag")
-        )
-        os.system("cat " + os.path.join(self.root, "LRS3", "lrs3_pretrain_part*") + " > " +  os.path.join(self.root, "LRS3", "lrs3_pretrain.zip"))
-        extract_archive(
-            from_path=os.path.join(self.root, "LRS3", "lrs3_pretrain.zip"),
-            to_path=os.path.join(self.root, "LRS3")
-        )   
+#         # Download Pretrain
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partaa",
+#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partaa")
+#         )
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partab",
+#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partab")
+#         )
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partac",
+#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partac")
+#         )
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partad",
+#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partad")
+#         )
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partae",
+#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partae")
+#         )
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partaf",
+#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partaf")
+#         )
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partag",
+#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partag")
+#         )
+#         os.system("cat " + os.path.join(self.root, "LRS3", "lrs3_pretrain_part*") + " > " +  os.path.join(self.root, "LRS3", "lrs3_pretrain.zip"))
+#         extract_archive(
+#             from_path=os.path.join(self.root, "LRS3", "lrs3_pretrain.zip"),
+#             to_path=os.path.join(self.root, "LRS3")
+#         )   
 
-        # Download Trainval
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_trainval.zip",
-            path=os.path.join(self.root, "LRS3", "lrs3_trainval.zip")
-        )  
-        extract_archive(
-            from_path=os.path.join(self.root, "LRS3", "lrs3_trainval.zip"),
-            to_path=os.path.join(self.root, "LRS3")
-        )      
+#         # Download Trainval
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_trainval.zip",
+#             path=os.path.join(self.root, "LRS3", "lrs3_trainval.zip")
+#         )  
+#         extract_archive(
+#             from_path=os.path.join(self.root, "LRS3", "lrs3_trainval.zip"),
+#             to_path=os.path.join(self.root, "LRS3")
+#         )      
 
-        # Download Test
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_test_v0.4.zip",
-            path=os.path.join(self.root, "LRS3", "lrs3_test_v0.4.zip")
-        )  
-        extract_archive(
-            from_path=os.path.join(self.root, "LRS3", "lrs3_test_v0.4.zip"),
-            to_path=os.path.join(self.root, "LRS3")
-        )  
+#         # Download Test
+#         self.download_file(
+#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_test_v0.4.zip",
+#             path=os.path.join(self.root, "LRS3", "lrs3_test_v0.4.zip")
+#         )  
+#         extract_archive(
+#             from_path=os.path.join(self.root, "LRS3", "lrs3_test_v0.4.zip"),
+#             to_path=os.path.join(self.root, "LRS3")
+#         )  
 
-        # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
-        gdown.download("https://drive.google.com/uc?id=1QRdOgeHvmKK8t4hsceFVf_BSpidQfUyW", os.path.join(self.root, "LRS3", "LRS3_landmarks.zip"), quiet=False)
-        extract_archive(
-            from_path=os.path.join(self.root, "LRS3", "LRS3_landmarks.zip"),
-            to_path=os.path.join(self.root, "LRS3")
-        )
+#         # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
+#         gdown.download("https://drive.google.com/uc?id=1QRdOgeHvmKK8t4hsceFVf_BSpidQfUyW", os.path.join(self.root, "LRS3", "LRS3_landmarks.zip"), quiet=False)
+#         extract_archive(
+#             from_path=os.path.join(self.root, "LRS3", "LRS3_landmarks.zip"),
+#             to_path=os.path.join(self.root, "LRS3")
+#         )
 
     def download(self):
 
