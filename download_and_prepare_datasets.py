@@ -5,12 +5,12 @@ import os
 workers_prepare = -1 # Set to -1 for nproc
 mean_face_path = "media/20words_mean_face.npy"
 tokenizer_path = "datasets/LRS3/tokenizerbpe256.model"
-lrw_username = "" # Set to your lrw username
-lrw_password = "" # Set to your lrw password
+#lrw_username = "" # Set to your lrw username
+#lrw_password = "" # Set to your lrw password
 lrs2_username = "lrs2008" # Set to your lrs2 username
 lrs2_password = "eT7uonoh" # Set to your lrs2 password
-lrs3_username = "" # Set to your lrs3 username
-lrs3_password = "" # Set to your lrs3 password
+#lrs3_username = "" # Set to your lrs3 username
+#lrs3_password = "" # Set to your lrs3 password
 
 # print("Download and Prepare LRW")
 # os.environ["LRW_USERNAME"] = lrw_username
