@@ -367,7 +367,7 @@ class LRS(Dataset):
 
     def download_lrs2(self):
 
-        parts = ["lrs2_v1_partaa", "lrs2_v1_partab", "lrs2_v1_partac", "lrs2_v1_partad", "lrs2_v1_partae"]
+        parts = ["lrs2_v1_partad", "lrs2_v1_partae"]
         base_url = "https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/"
         root_path = os.path.join(self.root, "LRS2")
     
