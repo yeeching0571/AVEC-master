@@ -17,10 +17,10 @@ lrs2_password = "eT7uonoh" # Set to your lrs2 password
 # os.environ["LRW_PASSWORD"] = lrw_password
 # lrw_dataset = nnet.datasets.LRW(None, None, download=True, prepare=True, mean_face_path=mean_face_path, workers_prepare=workers_prepare, mode="train")
 
-print("Download and Prepare LRS2")
+print("Download and Prepare EGO4D")
 os.environ["LRS2_USERNAME"] = lrs2_username
 os.environ["LRS2_PASSWORD"] = lrs2_password
-lrs2_dataset = nnet.datasets.LRS(None, None, version="LRS2", download=True, prepare=True, tokenizer_path=tokenizer_path, mean_face_path=mean_face_path, workers_prepare=workers_prepare, mode="pretrain+train+val")
+ego4d_dataset = nnet.datasets.EGO4D(None, None, version="EGO4D", download=True, prepare=True, tokenizer_path=tokenizer_path, mean_face_path=mean_face_path, workers_prepare=workers_prepare, mode="pretrain+train+val")
 
 # print("Download and Prepare LRS3")
 # os.environ["LRS3_USERNAME"] = lrs3_username
@@ -29,15 +29,15 @@ lrs2_dataset = nnet.datasets.LRS(None, None, version="LRS2", download=True, prep
 
 print("Create Corpora")
 # lrs2_dataset.create_corpus(mode="pretrain")
-# lrs2_dataset.create_corpus(mode="train")
-lrs2_dataset.create_corpus(mode="val")
-# lrs2_dataset.create_corpus(mode="test")
+ego4d_dataset.create_corpus(mode="train")
+ego4d_dataset.create_corpus(mode="val")
+ego4d_dataset.create_corpus(mode="test")
 # lrs3_dataset.create_corpus(mode="pretrain")
 # lrs3_dataset.create_corpus(mode="trainval")
 # lrs3_dataset.create_corpus(mode="test")
 
-filenames = ["datasets/LRS2/corpus_pretrain.txt", "datasets/LRS2/corpus_train.txt", "datasets/LRS2/corpus_val.txt", "datasets/LRS3/corpus_pretrain.txt", "datasets/LRS3/corpus_trainval.txt"]
-with open("datasets/LRS3/corpus_lrs23_pretrain+train+val.txt", "w") as fw:
+filenames = ["datasets/EGO4D/corpus_pretrain.txt", "datasets/EGO4D/corpus_train.txt", "datasets/EGO4D/corpus_val.txt", "datasets/EGO4D/corpus_test.txt", "datasets/EGO4D/corpus_trainval.txt"]
+with open("datasets/EGO4D/corpus_ego4d_train+val.txt", "w") as fw:
     for filename in filenames:
         try:
             with open(filename, "r") as fr:
