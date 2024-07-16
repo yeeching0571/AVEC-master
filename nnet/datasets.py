@@ -365,50 +365,62 @@ class LRS(Dataset):
 
         return video, audio, label, video_len, audio_len, label_len
 
-    def download_lrs2(self):
 
-        parts = ["lrs2_v1_partad", "lrs2_v1_partae"]
+
+    def download_file(self, url, path):
+            with requests.get(url, stream=True) as r:
+                with open(path, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=1024):
+                        f.write(chunk)
+
+    def download_lrs2(self):
+        part = "lrs2_v1_partaa"
         base_url = "https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/"
         root_path = os.path.join(self.root, "LRS2")
     
         if not os.path.exists(root_path):
             os.makedirs(root_path)
     
-        # download
-        for part in parts:
-            file_path = os.path.join(root_path, part)
-            if not os.path.exists(file_path):
-                self.download_file(url=base_url + part, path=file_path)
-            else:
-                print(f"File {file_path} already exists, skipping download.")
+        # 下载指定的部分文件
+        file_path = os.path.join(root_path, part)
+        if not os.path.exists(file_path):
+            print(f"Downloading {part}...")
+            self.download_file(url=base_url + part, path=file_path)
+        else:
+            print(f"File {file_path} already exists, skipping download.")
     
-        # aichive
+        # 重命名文件为 tar 格式
         tar_path = os.path.join(root_path, "lrs2_v1.tar")
         if not os.path.exists(tar_path):
-            os.system("cat " + os.path.join(root_path, "lrs2_v1_parta*") + " > " + tar_path)
+            os.rename(file_path, tar_path)
+            print(f"File renamed to {tar_path}.")
         else:
-            print(f"File {tar_path} already exists, skipping merge.")
+            print(f"File {tar_path} already exists, skipping rename.")
     
-        extract_archive(from_path=tar_path, to_path=root_path)
+        # 解压文件
+        try:
+            extract_archive(from_path=tar_path, to_path=root_path)
+            print(f"Extracted {tar_path} successfully.")
+        except Exception as e:
+            print(f"Failed to extract {tar_path}: {e}")
 
-        # Filelist
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/pretrain.txt",
-            path=os.path.join(self.root, "LRS2", "pretrain.txt")
-        ) 
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/train.txt",
-            path=os.path.join(self.root, "LRS2", "train.txt")
-        )  
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/val.txt",
-            path=os.path.join(self.root, "LRS2", "val.txt")
-        )  
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/test.txt",
-            path=os.path.join(self.root, "LRS2", "test.txt")
-        )   
+        # 定义 Google Drive 文件的 URL 和对应的文件名
+        google_drive_files = [
+            ("https://drive.google.com/uc?id=1I8ew6ekQlqLDqrpwVsZOFAI6Uko3r3gs", "test.txt"),
+            ("https://drive.google.com/uc?id=1KKqollCD0Xu-CCv4u90iZxOLobQcquqm", "train.txt"),
+            ("https://drive.google.com/uc?id=16qvCcWUpkpZzwaxeT_ihGqbp6Z3_593y", "val.txt"),
+        ]
 
+        # 下载每个文件
+        for url, filename in google_drive_files:
+            file_path = os.path.join(self.root, "LRS2", filename)
+            
+            if not os.path.exists(file_path):
+                print(f"Downloading {filename} from Google Drive...")
+                gdown.download(url, file_path, quiet=False)
+            else:
+                print(f"File {file_path} already exists, skipping download.")
+                
         # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
         gdown.download("https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy", os.path.join(self.root, "LRS2", "LRS2_landmarks.zip"), quiet=False)
         extract_archive(
