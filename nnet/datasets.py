@@ -367,32 +367,29 @@ class LRS(Dataset):
 
     def download_lrs2(self):
 
-        # Download Pretrain
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/lrs2_v1_partaa",
-            path=os.path.join(self.root, "LRS2", "lrs2_v1_partaa")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/lrs2_v1_partab",
-            path=os.path.join(self.root, "LRS2", "lrs2_v1_partab")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/lrs2_v1_partac",
-            path=os.path.join(self.root, "LRS2", "lrs2_v1_partac")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/lrs2_v1_partad",
-            path=os.path.join(self.root, "LRS2", "lrs2_v1_partad")
-        )
-        self.download_file(
-            url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/lrs2_v1_partae",
-            path=os.path.join(self.root, "LRS2", "lrs2_v1_partae")
-        )
-        os.system("cat " + os.path.join(self.root, "LRS2", "lrs2_v1_parta*") + " > " +  os.path.join(self.root, "LRS2", "lrs2_v1.tar"))
-        extract_archive(
-            from_path=os.path.join(self.root, "LRS2", "lrs2_v1.tar"),
-            to_path=os.path.join(self.root, "LRS2")
-        )   
+        parts = ["lrs2_v1_partaa", "lrs2_v1_partab", "lrs2_v1_partac", "lrs2_v1_partad", "lrs2_v1_partae"]
+        base_url = "https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/"
+        root_path = os.path.join(self.root, "LRS2")
+    
+        if not os.path.exists(root_path):
+            os.makedirs(root_path)
+    
+        # download
+        for part in parts:
+            file_path = os.path.join(root_path, part)
+            if not os.path.exists(file_path):
+                self.download_file(url=base_url + part, path=file_path)
+            else:
+                print(f"File {file_path} already exists, skipping download.")
+    
+        # aichive
+        tar_path = os.path.join(root_path, "lrs2_v1.tar")
+        if not os.path.exists(tar_path):
+            os.system("cat " + os.path.join(root_path, "lrs2_v1_parta*") + " > " + tar_path)
+        else:
+            print(f"File {tar_path} already exists, skipping merge.")
+    
+        extract_archive(from_path=tar_path, to_path=root_path)
 
         # Filelist
         self.download_file(
