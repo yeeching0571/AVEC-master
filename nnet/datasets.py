@@ -29,6 +29,7 @@ import requests
 import pickle
 import gdown
 import multiprocessing
+import zipfile
 
 # NeuralNets
 from nnet import layers
