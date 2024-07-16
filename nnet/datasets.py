@@ -384,13 +384,14 @@ class EGO4D(Dataset):
         elif self.version == "LRS3":
             self.download_lrs3()
 
-    def download_file(self, url, path):
+    # download LSR2/LRS3 files
+    # def download_file(self, url, path):
 
-        # Download, Open and Write
-        with requests.get(url, auth=(os.getenv("{}_USERNAME".format(self.version)), os.getenv("{}_PASSWORD".format(self.version))), stream=True) as r:
-            with open(path, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=1024):
-                    f.write(chunk)
+    #     # Download, Open and Write
+    #     with requests.get(url, auth=(os.getenv("{}_USERNAME".format(self.version)), os.getenv("{}_PASSWORD".format(self.version))), stream=True) as r:
+    #         with open(path, 'wb') as f:
+    #             for chunk in r.iter_content(chunk_size=1024):
+    #                 f.write(chunk)
 
     class PrepareDataset:
 
