@@ -69,60 +69,12 @@ class MultiDataset(Dataset):
             if n < ctr:
                 return dataset.__getitem__(n - ctr_prev)
             
-class LRS(Dataset):
+class EGO4D(Dataset):
 
-    """ LRS2 and LRS3 datasets
-    
-    Lip Reading Sentences 2 (LRS2) Dataset : https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html
+    def __init__(self, batch_size, collate_fn, version="EGO4D", img_mean=(0.5,), img_std=(0.5,), crop_mouth=True, root="datasets", shuffle=True, ascending=False, mode="pretrain+train+val", load_audio=True, load_video=True, video_transform=None, audio_transform=None, download=False, prepare=False, workers_prepare=-1, video_max_length=None, audio_max_length=None, label_max_length=None, tokenizer_path="datasets/LRS3/tokenizerbpe256.model", mean_face_path="media/20words_mean_face.npy", align=False):
+        super(EGO4D, self).__init__(batch_size=batch_size, collate_fn=collate_fn, root=root, shuffle=shuffle and not ascending)
 
-    The dataset consists of thousands of spoken sentences from BBC television. Each sentences is up to 100 characters in length. 
-    The training, validation and test sets are divided according to broadcast date. The dataset statistics are given in the table below.
-    The utterances in the pre-training set correspond to part-sentences as well as multiple sentences, whereas the training set only consists of single full sentences or phrases. 
-    There is some overlap between the pre-training and the training sets.
-    Although there might be some label noise in the pre-training and the training sets, the test set has undergone additional verification; so, to the best of our knowledge, there are no errors in the test set.
-
-    Infos:
-        37 characters: 26 (a-z) letters + apostrophe (') + 10 (0-9) numbers
-        total = 144482 samples
-        pretrain + train = 142,157 training samples, 224 hours
-        160 x 160, 25 fps videos
-
-        - 96,318 pretrain samples, pretrain folder, 195 hours
-        - 45,839 train samples, main folder, 28 hours
-        - 1,082 val samples, main folder, 0.6 hours
-        - 1,243 test samples, main folder, 0.5 hours
-
-    Reference: "Deep Audio-Visual Speech Recognition", Afouras et al.
-    https://arxiv.org/abs/1809.02108
-
-
-    --------------------------------------------------------------------------------------------------------------------
-    
-
-    Lip Reading Sentences 3 (LRS3) Dataset : https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html
-
-    The dataset consists of thousands of spoken sentences from TED and TEDx videos. 
-    There is no overlap between the videos used to create the test set and the ones used for the pre-train and trainval sets.
-
-    Reference: "LRS3-TED: a large-scale dataset for visual speech recognition", Afouras et al.
-    https://arxiv.org/abs/1809.00496
-
-    151,819 total samples
-    150,498 pretrain + trainval samples, 438 hours
-    118,516 pretrain samples from 5,090 videos, 407 hours
-    31,982 trainval samples from 4,004 videos, 30 hours
-    1,321 test samples from 412 videos, 1 hour
-
-    37 characters: 26 (a-z) letters + apostrophe (') + 10 (0-9) numbers
-    16kHz audio
-    25fps 224x224pixel video
-    
-    """
-
-    def __init__(self, batch_size, collate_fn, version="LRS2", img_mean=(0.5,), img_std=(0.5,), crop_mouth=True, root="datasets", shuffle=True, ascending=False, mode="pretrain+train+val", load_audio=True, load_video=True, video_transform=None, audio_transform=None, download=False, prepare=False, workers_prepare=-1, video_max_length=None, audio_max_length=None, label_max_length=None, tokenizer_path="datasets/LRS3/tokenizerbpe256.model", mean_face_path="media/20words_mean_face.npy", align=False):
-        super(LRS, self).__init__(batch_size=batch_size, collate_fn=collate_fn, root=root, shuffle=shuffle and not ascending)
-
-        assert version in ["LRS2", "LRS3"]
+        assert version in ["EGO4D", "LRS2", "LRS3"]
 
         # Params
         self.version = version
@@ -147,30 +99,30 @@ class LRS(Dataset):
         if prepare:
             self.prepare()
 
-        # LRS2
-        if version == "LRS2":
+        # EGO4D
+        if version == "EGO4D":
 
             # Mode
-            assert mode in ["pretrain+train+val", "pretrain+train", "pretrain", "train", "val", "test"]
+            assert mode in ["train+val", "pretrain+train", "pretrain", "train", "val", "test"]
 
             # Paths
             self.paths = []
             if "pretrain" in mode:
-                with open(os.path.join(root, "LRS2", "pretrain.txt")) as f:
+                with open(os.path.join(root, "EGO4D", "pretrain.txt")) as f:
                     for line in f.readlines():
-                        self.paths.append(os.path.join(root, "LRS2", "mvlrs_v1", "pretrain", line.replace("\n", "")))
+                        self.paths.append(os.path.join(root, "EGO4D", "pretrain_set", line.replace("\n", "")))
             if "train" in mode:
-                with open(os.path.join(root, "LRS2", "train.txt")) as f:
+                with open(os.path.join(root, "EGO4D", "train.txt")) as f:
                     for line in f.readlines():
-                        self.paths.append(os.path.join(root, "LRS2", "mvlrs_v1", "main", line.replace("\n", "")))
+                        self.paths.append(os.path.join(root, "EGO4D", "train_set", line.replace("\n", "")))
             if "val" in mode:
-                with open(os.path.join(root, "LRS2", "val.txt")) as f:
+                with open(os.path.join(root, "EGO4D", "val.txt")) as f:
                     for line in f.readlines():
-                        self.paths.append(os.path.join(root, "LRS2", "mvlrs_v1", "main", line.replace("\n", "")))
+                        self.paths.append(os.path.join(root, "EGO4D", "val_set", line.replace("\n", "")))
             if "test" in mode:
-                with open(os.path.join(root, "LRS2", "test.txt")) as f:
+                with open(os.path.join(root, "EGO4D", "test.txt")) as f:
                     for line in f.readlines():
-                        self.paths.append(os.path.join(root, "LRS2", "mvlrs_v1", "main", line.split()[0]))
+                        self.paths.append(os.path.join(root, "EGO4D", "test_set", line.split()[0]))
 
         # LRS3
         elif version == "LRS3":
@@ -227,34 +179,26 @@ class LRS(Dataset):
             print("Create Corpus File: {} {}".format(self.version, mode))
             corpus_file = open(corpus_path, "w")
 
-            # LRS2
-            if self.version == "LRS2":
-
-                if "pretrain" == mode:
-                    with open(os.path.join(self.root, "LRS2", "pretrain.txt")) as f:
-                        for line in tqdm(f.readlines()):
-                            with open(os.path.join(self.root, "LRS2", "mvlrs_v1", "pretrain", line.replace("\n", "") + ".txt"), "r") as f:
-                                line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
-                                corpus_file.write(line)
-
+            # EGO4D
+            if self.version == "EGO4D":
                 if "train" == mode:
-                    with open(os.path.join(self.root, "LRS2", "train.txt")) as f:
+                    with open(os.path.join(self.root, "EGO4D", "train.txt")) as f:
                         for line in tqdm(f.readlines()):
-                            with open(os.path.join(self.root, "LRS2", "mvlrs_v1", "main", line.replace("\n", "") + ".txt"), "r") as f:
+                            with open(os.path.join(self.root, "EGO4D", "train_set", line.replace("\n", "") + ".txt"), "r") as f:
                                 line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
                                 corpus_file.write(line)
 
                 if "val" == mode:
-                    with open(os.path.join(self.root, "LRS2", "val.txt")) as f:
+                    with open(os.path.join(self.root, "EGO4D", "val.txt")) as f:
                         for line in tqdm(f.readlines()):
-                            with open(os.path.join(self.root, "LRS2", "mvlrs_v1", "main", line.replace("\n", "") + ".txt"), "r") as f:
+                            with open(os.path.join(self.root, "EGO4D", "val_set", line.replace("\n", "") + ".txt"), "r") as f:
                                 line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
                                 corpus_file.write(line)
 
                 if "test" == mode:
-                    with open(os.path.join(self.root, "LRS2", "test.txt")) as f:
+                    with open(os.path.join(self.root, "EGO4D", "test.txt")) as f:
                         for line in tqdm(f.readlines()):
-                            with open(os.path.join(self.root, "LRS2", "mvlrs_v1", "main", line.split()[0] + ".txt"), "r") as f:
+                            with open(os.path.join(self.root, "EGO4D", "test_set", line.split()[0] + ".txt"), "r") as f:
                                 line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
                                 corpus_file.write(line)
 
@@ -373,36 +317,31 @@ class LRS(Dataset):
                     for chunk in r.iter_content(chunk_size=1024):
                         f.write(chunk)
 
-    def download_lrs2(self):
-        part = "lrs2_v1_partaa"
-        base_url = "https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data2/"
-        root_path = os.path.join(self.root, "LRS2")
+    def download_ego4d(self):
+        file_id = "1UUeskiOoMS-5nn4PEZQeWiZWC9Vfhdfk"
+        base_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        root_path = os.path.join(self.root, "EGO4D", "train_set")
     
         if not os.path.exists(root_path):
             os.makedirs(root_path)
     
         # 下载指定的部分文件
-        file_path = os.path.join(root_path, part)
+        file_name = "train_set1.zip"
+        file_path = os.path.join(root_path, file_name)
         if not os.path.exists(file_path):
-            print(f"Downloading {part}...")
-            self.download_file(url=base_url + part, path=file_path)
+            print(f"Downloading {file_name}...")
+            self.download_file(url=base_url, path=file_path)
         else:
             print(f"File {file_path} already exists, skipping download.")
     
-        # 重命名文件为 tar 格式
-        tar_path = os.path.join(root_path, "lrs2_v1.tar")
-        if not os.path.exists(tar_path):
-            os.rename(file_path, tar_path)
-            print(f"File renamed to {tar_path}.")
-        else:
-            print(f"File {tar_path} already exists, skipping rename.")
-    
         # 解压文件
         try:
-            extract_archive(from_path=tar_path, to_path=root_path)
-            print(f"Extracted {tar_path} successfully.")
+            with ZipFile(file_path, 'r') as zip_ref:
+                zip_ref.extractall(root_path)
+            print(f"Extracted {file_path} successfully.")
         except Exception as e:
-            print(f"Failed to extract {tar_path}: {e}")
+            print(f"Failed to extract {file_path}: {e}")
+
 
         # 定义 Google Drive 文件的 URL 和对应的文件名
         google_drive_files = [
@@ -413,7 +352,7 @@ class LRS(Dataset):
 
         # 下载每个文件
         for url, filename in google_drive_files:
-            file_path = os.path.join(self.root, "LRS2", filename)
+            file_path = os.path.join(self.root, "EGO4D", filename)
             
             if not os.path.exists(file_path):
                 print(f"Downloading {filename} from Google Drive...")
@@ -422,75 +361,13 @@ class LRS(Dataset):
                 print(f"File {file_path} already exists, skipping download.")
                 
         # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
-        gdown.download("https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy", os.path.join(self.root, "LRS2", "LRS2_landmarks.zip"), quiet=False)
+        gdown.download("https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy", os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip"), quiet=False)
         extract_archive(
-            from_path=os.path.join(self.root, "LRS2", "LRS2_landmarks.zip"),
-            to_path=os.path.join(self.root, "LRS2")
+            from_path=os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip"),
+            to_path=os.path.join(self.root, "EGO4D")
         )   
 
-    # def download_lrs3(self):
 
-#         # Download Pretrain
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partaa",
-#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partaa")
-#         )
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partab",
-#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partab")
-#         )
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partac",
-#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partac")
-#         )
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partad",
-#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partad")
-#         )
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partae",
-#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partae")
-#         )
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partaf",
-#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partaf")
-#         )
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_pretrain_partag",
-#             path=os.path.join(self.root, "LRS3", "lrs3_pretrain_partag")
-#         )
-#         os.system("cat " + os.path.join(self.root, "LRS3", "lrs3_pretrain_part*") + " > " +  os.path.join(self.root, "LRS3", "lrs3_pretrain.zip"))
-#         extract_archive(
-#             from_path=os.path.join(self.root, "LRS3", "lrs3_pretrain.zip"),
-#             to_path=os.path.join(self.root, "LRS3")
-#         )   
-
-#         # Download Trainval
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_trainval.zip",
-#             path=os.path.join(self.root, "LRS3", "lrs3_trainval.zip")
-#         )  
-#         extract_archive(
-#             from_path=os.path.join(self.root, "LRS3", "lrs3_trainval.zip"),
-#             to_path=os.path.join(self.root, "LRS3")
-#         )      
-
-#         # Download Test
-#         self.download_file(
-#             url="https://thor.robots.ox.ac.uk/~vgg/data/lip_reading/data3/lrs3_test_v0.4.zip",
-#             path=os.path.join(self.root, "LRS3", "lrs3_test_v0.4.zip")
-#         )  
-#         extract_archive(
-#             from_path=os.path.join(self.root, "LRS3", "lrs3_test_v0.4.zip"),
-#             to_path=os.path.join(self.root, "LRS3")
-#         )  
-
-#         # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
-#         gdown.download("https://drive.google.com/uc?id=1QRdOgeHvmKK8t4hsceFVf_BSpidQfUyW", os.path.join(self.root, "LRS3", "LRS3_landmarks.zip"), quiet=False)
-#         extract_archive(
-#             from_path=os.path.join(self.root, "LRS3", "LRS3_landmarks.zip"),
-#             to_path=os.path.join(self.root, "LRS3")
-#         )
 
     def download(self):
 
@@ -498,9 +375,9 @@ class LRS(Dataset):
         print("Download Dataset")
         os.makedirs(os.path.join(self.root, self.version), exist_ok=True)
 
-        # LRS2
-        if self.version == "LRS2":
-            self.download_lrs2()
+        # EGO4D
+        if self.version == "EGO4D":
+            self.download_ego4d()
         
         # LRS3
         elif self.version == "LRS3":
@@ -635,6 +512,7 @@ class CorpusLM(Dataset):
 
     def __len__(self):
         return len(self.corpus)
+
 
 class LRW(Dataset):
 
