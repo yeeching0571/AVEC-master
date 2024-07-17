@@ -325,25 +325,30 @@ class EGO4D(Dataset):
     
         if not os.path.exists(root_path):
             os.makedirs(root_path)
-    
-        # 下载指定的部分文件
+
+         # 下载文件。如果文件已存在，则不下载。设置标志文件，判断是否已解压。
         file_name = "train_set1.zip"
         file_path = os.path.join(root_path, file_name)
+        extract_flag = os.path.join(root_path, "train_set1_extracted.flag")
+        
         if not os.path.exists(file_path):
             print(f"Downloading {file_name}...")
-            self.download_file(url=base_url, path=file_path)
+            gdown.download(base_url, file_path, quiet=False)
         else:
             print(f"File {file_path} already exists, skipping download.")
-    
-        # 解压文件
-        try:
-            with ZipFile(file_path, 'r') as zip_ref:
-                zip_ref.extractall(root_path)
-            print(f"Extracted {file_path} successfully.")
-        except Exception as e:
-            print(f"Failed to extract {file_path}: {e}")
-
-
+        
+        if not os.path.exists(extract_flag):
+            try:
+                with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                    zip_ref.extractall(root_path)
+                print(f"Extracted {file_path} successfully.")
+                with open(extract_flag, 'w') as f:
+                    f.write('Extraction completed')
+            except Exception as e:
+                print(f"Failed to extract {file_path}: {e}")
+        else:
+            print(f"File {file_path} already extracted, skipping extraction.")
+            
         # 定义 Google Drive 文件的 URL 和对应的文件名
         google_drive_files = [
             ("https://drive.google.com/uc?id=1I8ew6ekQlqLDqrpwVsZOFAI6Uko3r3gs", "test.txt"),
@@ -362,11 +367,18 @@ class EGO4D(Dataset):
                 print(f"File {file_path} already exists, skipping download.")
                 
         # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
-        gdown.download("https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy", os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip"), quiet=False)
+        landmarks_url = "https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy"
+        landmarks_path = os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip")
+        if not os.path.exists(landmarks_path):
+            print(f"Downloading LRS2_landmarks.zip from Google Drive...")
+            gdown.download(landmarks_url, landmarks_path, quiet=False)
+        else:
+            print(f"File {landmarks_path} already exists, skipping download.")
+        
         extract_archive(
             from_path=os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip"),
             to_path=os.path.join(self.root, "EGO4D")
-        )   
+        )
 
 
 
@@ -419,8 +431,8 @@ class EGO4D(Dataset):
             # Save Audio
             torchaudio.save(file_path.replace(".txt", ".flac"), audio, sample_rate=16000)
 
-            # Extract Landmarks
-            if self.version == "LRS2":
+            # Extract Landmarks  File datasets/EGO4D/LRS2_landmarks.zip
+            if self.version == "EGO4D":
                 landmarks_pathname = file_path.replace(".txt", ".pkl").replace("mvlrs_v1", "LRS2_landmarks")
             elif self.version == "LRS3":
                 landmarks_pathname = file_path.replace(".txt", ".pkl").replace("LRS3", "LRS3/LRS3_landmarks")
@@ -453,8 +465,8 @@ class EGO4D(Dataset):
         # {NS} ~ non scripted
         # {LG} ~ Laughter
 
-        if self.version == "LRS2":
-            paths_txt = glob.glob(os.path.join(self.root, "LRS2", "*", "*", "*", "*.txt"))
+        if self.version == "EGO4D":
+            paths_txt = glob.glob(os.path.join(self.root, "EGO4D", "*", "*", "*.txt"))
         elif self.version == "LRS3":
             paths_txt = glob.glob(os.path.join(self.root, "LRS3", "*", "*", "*.txt"))
 
