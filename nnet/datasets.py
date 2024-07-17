@@ -128,19 +128,6 @@ class EGO4D(Dataset):
                     for line in f.readlines():
                         self.paths.append(os.path.join(root, "EGO4D", "test_set", line.split()[0]))
 
-        # LRS3
-        elif version == "LRS3":
-
-            # Mode
-            assert mode in ["pretrain+trainval", "pretrain", "trainval", "test"]
-
-            # Paths
-            self.paths = []
-            for m in mode.split("+"):
-                self.paths += glob.glob(os.path.join(root, "LRS3", m, "*", "*.txt"))
-            for i, path in enumerate(self.paths):
-                self.paths[i] = path[:-4]
-
         # Video Transforms
         self.video_preprocessing = torchvision.transforms.Compose([
             torchvision.transforms.ConvertImageDtype(dtype=torch.float32),
@@ -322,8 +309,8 @@ class EGO4D(Dataset):
                         f.write(chunk)
 
     def download_ego4d(self):
-        file_id = "1UUeskiOoMS-5nn4PEZQeWiZWC9Vfhdfk"
-        base_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        # file_id = "1UUeskiOoMS-5nn4PEZQeWiZWC9Vfhdfk"
+        # base_url = f"https://drive.google.com/uc?export=download&id={file_id}"
         root_path = os.path.join(self.root, "EGO4D", "train_set")
     
         if not os.path.exists(root_path):
@@ -370,33 +357,33 @@ class EGO4D(Dataset):
                 print(f"File {file_path} already exists, skipping download.")
                 
         # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
-        landmarks_url = "https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy"
-        landmarks_path = os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip")
-        extract_to_path = os.path.join(self.root, "EGO4D")
-        check_file_path = os.path.join(extract_to_path, "path_to_check_file")
+        # landmarks_url = "https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy"
+        # landmarks_path = os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip")
+        # extract_to_path = os.path.join(self.root, "EGO4D")
+        # check_file_path = os.path.join(extract_to_path, "path_to_check_file")
 
     
-        if not os.path.exists(landmarks_path):
-            print(f"Downloading LRS2_landmarks.zip from Google Drive...")
-            try:
-                gdown.download(landmarks_url, landmarks_path, quiet=False)
-            except Exception as e:
-                print(f"Failed to download LRS2_landmarks.zip: {e}")
-        else:
-            print(f"File {landmarks_path} already exists, skipping download.")
+        # if not os.path.exists(landmarks_path):
+        #     print(f"Downloading LRS2_landmarks.zip from Google Drive...")
+        #     try:
+        #         gdown.download(landmarks_url, landmarks_path, quiet=False)
+        #     except Exception as e:
+        #         print(f"Failed to download LRS2_landmarks.zip: {e}")
+        # else:
+        #     print(f"File {landmarks_path} already exists, skipping download.")
 
       
-        if not os.path.exists(check_file_path):
-            print(f"Extracting LRS2_landmarks.zip to {extract_to_path}...")
-            try:
-                extract_archive(
-                    from_path=landmarks_path,
-                    to_path=extract_to_path
-                )
-            except Exception as e:
-                print(f"Failed to extract LRS2_landmarks.zip: {e}")
-        else:
-            print(f"File {check_file_path} already exists, skipping extraction.")
+        # if not os.path.exists(check_file_path):
+        #     print(f"Extracting LRS2_landmarks.zip to {extract_to_path}...")
+        #     try:
+        #         extract_archive(
+        #             from_path=landmarks_path,
+        #             to_path=extract_to_path
+        #         )
+        #     except Exception as e:
+        #         print(f"Failed to extract LRS2_landmarks.zip: {e}")
+        # else:
+        #     print(f"File {check_file_path} already exists, skipping extraction.")
 
 
 
@@ -452,7 +439,7 @@ class EGO4D(Dataset):
 
             # Extract Landmarks  File datasets/EGO4D/LRS2_landmarks.zip
             if self.version == "EGO4D":
-                landmarks_pathname = file_path.replace(".txt", ".pkl").replace("mvlrs_v1", "LRS2_landmarks")
+                landmarks_pathname = file_path.replace(".txt", ".pkl").replace("train_set", "ego4d_landmarks")
             elif self.version == "LRS3":
                 landmarks_pathname = file_path.replace(".txt", ".pkl").replace("LRS3", "LRS3/LRS3_landmarks")
             with open(landmarks_pathname, "br") as f:
@@ -546,8 +533,6 @@ class CorpusLM(Dataset):
     def __len__(self):
         return len(self.corpus)
 
-
-class LRW(Dataset):
 
     """ Lip Reading in the Wild (LRW) Dataset : https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html
 
