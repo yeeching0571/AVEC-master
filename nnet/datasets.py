@@ -30,6 +30,9 @@ import pickle
 import gdown
 import multiprocessing
 import zipfile
+import time
+from google.colab import drive
+import shutil
 
 # NeuralNets
 from nnet import layers
@@ -369,16 +372,32 @@ class EGO4D(Dataset):
         # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
         landmarks_url = "https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy"
         landmarks_path = os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip")
+        extract_to_path = os.path.join(self.root, "EGO4D")
+        check_file_path = os.path.join(extract_to_path, "path_to_check_file")
+
+    
         if not os.path.exists(landmarks_path):
             print(f"Downloading LRS2_landmarks.zip from Google Drive...")
-            gdown.download(landmarks_url, landmarks_path, quiet=False)
+            try:
+                gdown.download(landmarks_url, landmarks_path, quiet=False)
+            except Exception as e:
+                print(f"Failed to download LRS2_landmarks.zip: {e}")
         else:
             print(f"File {landmarks_path} already exists, skipping download.")
-        
-        extract_archive(
-            from_path=os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip"),
-            to_path=os.path.join(self.root, "EGO4D")
-        )
+
+      
+        if not os.path.exists(check_file_path):
+            print(f"Extracting LRS2_landmarks.zip to {extract_to_path}...")
+            try:
+                extract_archive(
+                    from_path=landmarks_path,
+                    to_path=extract_to_path
+                )
+            except Exception as e:
+                print(f"Failed to extract LRS2_landmarks.zip: {e}")
+        else:
+            print(f"File {check_file_path} already exists, skipping extraction.")
+
 
 
 
