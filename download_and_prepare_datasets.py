@@ -14,7 +14,7 @@ tokenizer_path = "datasets/LRS3/tokenizerbpe256.model"
 
 print("Download and Prepare EGO4D")
 datasets = nnet.get_datasets()
-ego4d_dataset = nnet.datasets.EGO4D(None, None, version="EGO4D", download=True, prepare=True, tokenizer_path=tokenizer_path, mean_face_path=mean_face_path, workers_prepare=workers_prepare, mode="train")
+ego4d_dataset = nnet.datasets.EGO4D(batch_size=16, None, version="EGO4D", download=True, prepare=True, tokenizer_path=tokenizer_path, mean_face_path=mean_face_path, workers_prepare=2, mode="train")
 
 
 print("Create Corpora")
