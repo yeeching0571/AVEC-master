@@ -32,7 +32,8 @@ import multiprocessing
 import zipfile
 import time
 from google.colab import drive
-import shutil
+import psutil
+import ipdb;
 
 # NeuralNets
 from nnet import layers
@@ -47,7 +48,7 @@ from nnet import collate_fn
 
 class Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, batch_size=8, collate_fn=collate_fn.Collate(), root="datasets", shuffle=True):
+    def __init__(self, batch_size=16, collate_fn=collate_fn.Collate(), root="datasets", shuffle=True):
         self.batch_size = batch_size
         self.collate_fn = collate_fn
         self.root = root
@@ -75,7 +76,7 @@ class MultiDataset(Dataset):
             
 class EGO4D(Dataset):
 
-    def __init__(self, batch_size, collate_fn, version="EGO4D", img_mean=(0.5,), img_std=(0.5,), crop_mouth=True, root="datasets", shuffle=True, ascending=False, mode="pretrain+train+val", load_audio=True, load_video=True, video_transform=None, audio_transform=None, download=False, prepare=False, workers_prepare=-1, video_max_length=None, audio_max_length=None, label_max_length=None, tokenizer_path="datasets/LRS3/tokenizerbpe256.model", mean_face_path="media/20words_mean_face.npy", align=False):
+    def __init__(self, batch_size, collate_fn, version="EGO4D", img_mean=(0.5,), img_std=(0.5,), crop_mouth=True, root="datasets", shuffle=True, ascending=False, mode="pretrain+train+val", load_audio=True, load_video=True, video_transform=None, audio_transform=None, download=False, prepare=False, workers_prepare=2, video_max_length=None, audio_max_length=None, label_max_length=None, tokenizer_path="datasets/LRS3/tokenizerbpe256.model", mean_face_path="media/20words_mean_face.npy", align=False):
         super(EGO4D, self).__init__(batch_size=batch_size, collate_fn=collate_fn, root=root, shuffle=shuffle and not ascending)
 
         assert version in ["EGO4D", "LRS2", "LRS3"]
@@ -163,35 +164,37 @@ class EGO4D(Dataset):
 
     def create_corpus(self, mode):
 
+        print("Enter create_corpus")
         corpus_path = os.path.join(self.root, self.version, "corpus_{}.txt".format(mode))
-        
-        if not os.path.isfile(corpus_path):
+        #ipdb.set_trace()
+        print("Create Corpus File: {} {}".format(self.version, mode))
+        corpus_file = open(corpus_path, "w")
 
-            print("Create Corpus File: {} {}".format(self.version, mode))
-            corpus_file = open(corpus_path, "w")
+        # EGO4D
+        #ipdb.set_trace()
+        if self.version == "EGO4D":
+            if "train" == mode:
+                with open(os.path.join(self.root, "EGO4D", "train.txt")) as f:
+                    for line in tqdm(f.readlines()):
+                        ipdb.set_trace()
+                        with open(os.path.join(self.root, "EGO4D", "train_set", line.replace("\n", "") + ".txt"), "r") as f:
+                            ipdb.set_trace()
+                            line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
+                            corpus_file.write(line)
 
-            # EGO4D
-            if self.version == "EGO4D":
-                if "train" == mode:
-                    with open(os.path.join(self.root, "EGO4D", "train.txt")) as f:
-                        for line in tqdm(f.readlines()):
-                            with open(os.path.join(self.root, "EGO4D", "train_set", line.replace("\n", "") + ".txt"), "r") as f:
-                                line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
-                                corpus_file.write(line)
+            if "val" == mode:
+                with open(os.path.join(self.root, "EGO4D", "val.txt")) as f:
+                    for line in tqdm(f.readlines()):
+                        with open(os.path.join(self.root, "EGO4D", "val_set", line.replace("\n", "") + ".txt"), "r") as f:
+                            line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
+                            corpus_file.write(line)
 
-                if "val" == mode:
-                    with open(os.path.join(self.root, "EGO4D", "val.txt")) as f:
-                        for line in tqdm(f.readlines()):
-                            with open(os.path.join(self.root, "EGO4D", "val_set", line.replace("\n", "") + ".txt"), "r") as f:
-                                line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
-                                corpus_file.write(line)
-
-                if "test" == mode:
-                    with open(os.path.join(self.root, "EGO4D", "test.txt")) as f:
-                        for line in tqdm(f.readlines()):
-                            with open(os.path.join(self.root, "EGO4D", "test_set", line.split()[0] + ".txt"), "r") as f:
-                                line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
-                                corpus_file.write(line)
+            if "test" == mode:
+                with open(os.path.join(self.root, "EGO4D", "test.txt")) as f:
+                    for line in tqdm(f.readlines()):
+                        with open(os.path.join(self.root, "EGO4D", "test_set", line.split()[0] + ".txt"), "r") as f:
+                            line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
+                            corpus_file.write(line)
 
             # LRS3
             elif self.version == "LRS3":
@@ -201,6 +204,7 @@ class EGO4D(Dataset):
                         line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
                         corpus_file.write(line)
 
+            
     class FilterDataset:
 
         def __init__(self, paths):
@@ -230,7 +234,7 @@ class EGO4D(Dataset):
                 # Create Dataloader
                 dataloader = torch.utils.data.DataLoader(
                     self.FilterDataset(self.paths),
-                    batch_size=1,
+                    batch_size=16,
                     num_workers=self.workers_prepare,
                     collate_fn=collate_fn.Collate(),
                 )
@@ -339,11 +343,11 @@ class EGO4D(Dataset):
         else:
             print(f"File {file_path} already extracted, skipping extraction.")
             
-        # 定义 Google Drive 文件的 URL 和对应的文件名
+        # 定义 Google Drive 文件的 URL 和对应的文件名 
         google_drive_files = [
-            ("https://drive.google.com/uc?id=1I8ew6ekQlqLDqrpwVsZOFAI6Uko3r3gs", "test.txt"),
-            ("https://drive.google.com/uc?id=1KKqollCD0Xu-CCv4u90iZxOLobQcquqm", "train.txt"),
-            ("https://drive.google.com/uc?id=16qvCcWUpkpZzwaxeT_ihGqbp6Z3_593y", "val.txt"),
+            ("https://drive.google.com/file/d/15dqRtGiFlqVXMHCFCZZesc2FiGdDRauz", "test.txt"),
+            ("https://drive.google.com/file/d/1I6_Z5r6TMVXbMsXjXZsWjFmzuULDCvSc", "train.txt"),
+            ("https://drive.google.com/file/d/1xeZt3rpLubtNhIDLlpXDA7xjt8VCZev5", "val.txt"),
         ]
 
         # 下载每个文件
@@ -464,7 +468,8 @@ class EGO4D(Dataset):
             torch.save(infos, file_path.replace(".txt", ".pt"))
             
             return file_path, infos
-
+        
+ 
     def prepare(self):
 
         # Remove from corpus
@@ -498,12 +503,18 @@ class EGO4D(Dataset):
                 mean_face_path=self.mean_face_path,
                 version=self.version
             ),
-            batch_size=1,
+            batch_size=16,
             num_workers=self.workers_prepare,
             collate_fn=collate_fn.Collate(),
         )
-        for batch in tqdm(dataloader):
-            pass
+
+        try:
+            for batch in tqdm(dataloader):
+                # 处理数据
+                print_memory_usage()  # 打印内存使用情况
+                pass
+        except RuntimeError as e:
+            print(f"RuntimeError: {e}")
 
 class CorpusLM(Dataset):
 
@@ -678,7 +689,7 @@ class CorpusLM(Dataset):
                 paths=glob.glob(os.path.join(self.root, "LRW", "lipread_mp4", "*", "*", "*.txt")),
                 mean_face_path=self.mean_face_path
             ),
-            batch_size=1,
+            batch_size=16,
             num_workers=self.workers_prepare,
             collate_fn=collate_fn.Collate(),
         )
@@ -740,3 +751,9 @@ class CorpusLM(Dataset):
             with open(path, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=1024):
                     f.write(chunk)
+
+
+def print_memory_usage():
+    process = psutil.Process(os.getpid())
+    print(f"Memory usage: {process.memory_info().rss / (1024 ** 2):.2f} MB") 
+    
