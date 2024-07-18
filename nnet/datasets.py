@@ -167,42 +167,43 @@ class EGO4D(Dataset):
         print("Enter create_corpus")
         corpus_path = os.path.join(self.root, self.version, "corpus_{}.txt".format(mode))
         #ipdb.set_trace()
-        print("Create Corpus File: {} {}".format(self.version, mode))
-        corpus_file = open(corpus_path, "w")
+        if not os.path.isfile(corpus_path):
 
-        # EGO4D
-        #ipdb.set_trace()
-        if self.version == "EGO4D":
-            if "train" == mode:
-                with open(os.path.join(self.root, "EGO4D", "train.txt")) as f:
-                    for line in tqdm(f.readlines()):
-                        ipdb.set_trace()
-                        with open(os.path.join(self.root, "EGO4D", "train_set", line.replace("\n", "") + ".txt"), "r") as f:
-                            ipdb.set_trace()
+            print("Create Corpus File: {} {}".format(self.version, mode))
+            corpus_file = open(corpus_path, "w")
+
+            # EGO4D
+            #ipdb.set_trace()
+            if self.version == "EGO4D":
+                if "train" == mode:
+                    with open(os.path.join(self.root, "EGO4D", "train.txt")) as f:
+                        for line in tqdm(f.readlines()):
+                            with open(os.path.join(self.root, "EGO4D", "train_set", line.replace("\n", "") + ".txt"), "r") as f:
+                                line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
+                                # ipdb.set_trace()
+                                corpus_file.write(line)
+
+                if "val" == mode:
+                    with open(os.path.join(self.root, "EGO4D", "val.txt")) as f:
+                        for line in tqdm(f.readlines()):
+                            with open(os.path.join(self.root, "EGO4D", "val_set", line.replace("\n", "") + ".txt"), "r") as f:
+                                line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
+                                corpus_file.write(line)
+
+                if "test" == mode:
+                    with open(os.path.join(self.root, "EGO4D", "test.txt")) as f:
+                        for line in tqdm(f.readlines()):
+                            with open(os.path.join(self.root, "EGO4D", "test_set", line.split()[0] + ".txt"), "r") as f:
+                                line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
+                                corpus_file.write(line)
+
+                # LRS3
+                elif self.version == "LRS3":
+
+                    for file_path in tqdm(glob.glob(os.path.join(self.root, "LRS3", mode, "*", "*.txt"))):
+                        with open(file_path, "r") as f:
                             line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
                             corpus_file.write(line)
-
-            if "val" == mode:
-                with open(os.path.join(self.root, "EGO4D", "val.txt")) as f:
-                    for line in tqdm(f.readlines()):
-                        with open(os.path.join(self.root, "EGO4D", "val_set", line.replace("\n", "") + ".txt"), "r") as f:
-                            line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
-                            corpus_file.write(line)
-
-            if "test" == mode:
-                with open(os.path.join(self.root, "EGO4D", "test.txt")) as f:
-                    for line in tqdm(f.readlines()):
-                        with open(os.path.join(self.root, "EGO4D", "test_set", line.split()[0] + ".txt"), "r") as f:
-                            line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
-                            corpus_file.write(line)
-
-            # LRS3
-            elif self.version == "LRS3":
-
-                for file_path in tqdm(glob.glob(os.path.join(self.root, "LRS3", mode, "*", "*.txt"))):
-                    with open(file_path, "r") as f:
-                        line = f.readline()[7:].replace("{NS}", "").replace("{LG}", "").lower()
-                        corpus_file.write(line)
 
             
     class FilterDataset:
@@ -343,23 +344,20 @@ class EGO4D(Dataset):
         else:
             print(f"File {file_path} already extracted, skipping extraction.")
             
-        # 定义 Google Drive 文件的 URL 和对应的文件名 
+        # 定义 Google Drive 文件的 URL 和对应的文件名
         google_drive_files = [
-            ("https://drive.google.com/file/d/15dqRtGiFlqVXMHCFCZZesc2FiGdDRauz", "test.txt"),
-            ("https://drive.google.com/file/d/1I6_Z5r6TMVXbMsXjXZsWjFmzuULDCvSc", "train.txt"),
-            ("https://drive.google.com/file/d/1xeZt3rpLubtNhIDLlpXDA7xjt8VCZev5", "val.txt"),
+            ("15dqRtGiFlqVXMHCFCZZesc2FiGdDRauz", "test.txt"),
+            ("1I6_Z5r6TMVXbMsXjXZsWjFmzuULDCvSc", "train.txt"),
+            ("1xeZt3rpLubtNhIDLlpXDA7xjt8VCZev5", "val.txt"),
         ]
 
         # 下载每个文件
-        for url, filename in google_drive_files:
-            file_path = os.path.join(self.root, "EGO4D", filename)
-            
-            if not os.path.exists(file_path):
-                print(f"Downloading {filename} from Google Drive...")
-                gdown.download(url, file_path, quiet=False)
-            else:
-                print(f"File {file_path} already exists, skipping download.")
-                
+        for file_id, filename in google_drive_files:
+            file_path = os.path.join(self.root,"EGO4D", filename)
+            print(f"Downloading {filename} from Google Drive...")
+            url = f"https://drive.google.com/uc?id={file_id}"
+            gdown.download(url, file_path, quiet=False)
+
         # Download Landmarks from https://github.com/mpc001/Visual_Speech_Recognition_for_Multiple_Languages
         # landmarks_url = "https://drive.google.com/uc?id=1G2-rEUNeGotJ9EtTIj0UzqbvCSbn6CJy"
         # landmarks_path = os.path.join(self.root, "EGO4D", "LRS2_landmarks.zip")
